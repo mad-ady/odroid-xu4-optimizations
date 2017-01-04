@@ -1,0 +1,13 @@
+[Unit]
+Description=Setup special irq affinity
+Before=sysinit.target
+After=local-fs.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/bin/true
+ExecStartPost=-/bin/sh -c 'for i in `cat /proc/interrupts | grep usb | cut -d ":" -f 1`; do echo "4-7" > /proc/irq/$i/smp_affinity_list; done'
+
+[Install]
+WantedBy=sysinit.target
