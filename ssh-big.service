@@ -1,0 +1,18 @@
+[Unit]
+Description=OpenBSD Secure Shell server running on Big Cores
+After=network.target auditd.service
+ConditionPathExists=!/etc/ssh/sshd_not_to_be_run
+
+[Service]
+EnvironmentFile=-/etc/default/ssh
+ExecStart=/usr/sbin/sshd -D -f /etc/ssh/sshd_config_big $SSHD_OPTS
+ExecStartPost=-/bin/bash -c '/bin/echo $MAINPID > /sys/fs/cgroup/cpuset/bigcores/tasks'
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=notify
+
+[Install]
+WantedBy=multi-user.target
+#Alias=ssh-big.service
